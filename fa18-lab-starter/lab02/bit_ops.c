@@ -4,8 +4,7 @@
 // Assume 0 <= n <= 31
 unsigned get_bit(unsigned x,
                  unsigned n) {
-    x=x<<(31-n);
-    x=x>>31;
+    x=(x>>n)&1;
     // YOUR CODE HERE
     // Returning -1 is a placeholder (it makes
     // no sense, because get_bit only returns 
@@ -17,9 +16,7 @@ unsigned get_bit(unsigned x,
 void set_bit(unsigned * x,
              unsigned n,
              unsigned v) {
-    *x = ((*x>>(n+1)<<(n+1))+((
-        (*x<<(32-n)>>1)+(v<<31)
-        )>>(31-n)));
+    *x = (*x^(get_bit(*x,n)<<n))+(v<<n);
     // YOUR CODE HERE
 }
 // Flip the nth bit of the value of x.

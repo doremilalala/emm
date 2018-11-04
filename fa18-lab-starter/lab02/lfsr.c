@@ -4,12 +4,15 @@
 #include <string.h>
 
 void lfsr_calculate(uint16_t *reg) {
+  unsigned t = ((*reg)^(*reg>>2)^(*reg>>3)^(*reg>>5))&1;
+  *reg = (*reg>>1)|(t<<15);
 
   /* YOUR CODE HERE */
 
 }
 
 int main() {
+  
   int8_t *numbers = (int8_t*) malloc(sizeof(int8_t) * 65535);
   if (numbers == NULL) {
     printf("Memory allocation failed!");
