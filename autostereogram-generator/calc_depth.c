@@ -23,127 +23,70 @@ unsigned char normalized_displacement(int dx, int dy,
 void calc_depth(unsigned char *depth_map, unsigned char *left,
 	unsigned char *right, int image_width, int image_height,
 	int feature_width, int feature_height, int maximum_displacement) {
+		
+		int lefti[image_width][image_height],righti[image_width][image_height];// Trans to 2d array
 
-    int leftImage[image_width][image_height];  /* Transferring to an array */
-    for (int i = 0; i < image_width; i++) {
-    	for (int j = 0; j < image_height; j++) {
-    		leftImage[i][j] = *left;
-    		left = left + 1;
-    	}
-    }
-
-
- /*   for(int i = 0; i < image_width; i++) {
-    for(int j = 0; j < image_height; j++) {
-        printf("%d ", leftImage[i][j]);
-    }
-    printf("\n");
- }
-printf("\n");
-printf("\n"); */
-    int rightImage[image_width][image_height];    
-    for (int i = 0; i < image_width; i++) {
-    	for (int j = 0; j < image_height; j++) {
-    		rightImage[i][j] = *right;
-    		right = right + 1;
-    	}
-    }
-
-
- /*       for(int i = 0; i < image_width; i++) {
-    for(int j = 0; j < image_height; j++) {
-        printf("%d ", rightImage[i][j]);
-    }
-    printf("\n");
-}  */
-
-	int first = 1;
-	int currentMin;
-	int minX;
-	int minY;
-/*	printf("feature width is ");
-	printf("%d",feature_width);
-	printf("\n");
-	printf("feature height is ");
-	printf("%d",feature_height);
-	printf("\n");
-	printf("image_width is: ");
-	printf("%d",image_width);
-	printf("\n");
-	printf("image_height is: ");
-	printf("%d",image_height);
-	printf("\n");
-	printf("maximum_displacement is: ");
-	printf("%d",maximum_displacement);
-	printf("\n"); */
-	int curDisplacement;
-for (int i = 0; i < image_width; i++) {
-	for (int j = 0; j < image_height; j++) {  
-	first = 1;       
-		if ((i - feature_width < 0) | (i + feature_width > image_width) | (j - feature_height < 0) | (j + feature_height > image_height)) {        /* if part of feature lies outside image, set corresponding depth to zero and move on to next pixel */
-			*depth_map = 0;
-			depth_map = depth_map + 1;
-		}
-		else {
-			for (int x = i - maximum_displacement; x <= i + maximum_displacement; x++) {        /* x and y loop through the "search space" surrounding the pixel */
-				for (int y = j - maximum_displacement; y <= j + maximum_displacement; y++) {
-					if ((x - feature_width < 0) | (x + feature_width > image_width) | (y - feature_height < 0) | (y + feature_height > image_height)) {
-
-				}
-					else {  	
-						int leftImageSum[2*feature_width + 1][2*feature_height+1];
-						int *pointer;
-						pointer = &leftImageSum[0][0];
-						for (int a = i - feature_width; a <= i + feature_width; a++) {
-							for (int b = j - feature_height; b <= j + feature_height; b++) {
-									*pointer = leftImage[a][b];
-									pointer = pointer + 1;
-							}
-						}		
-						int currentSum[2*feature_width + 1][2*feature_height+1];
-						int *pointer1;
-						pointer1 = &currentSum[0][0];
-						for (int a  = x - feature_width; a <= x + feature_width; a++) {
-							for (int b = y - feature_height; b <= y + feature_height; b++) {
-								*pointer1 = rightImage[a][b];
-								pointer1 = pointer1 + 1;
-							}
-						}
-						int EuclidianSum = 0;
-						for (int a = 0; a < 2*feature_width + 1; a++) {
-							for (int b = 0; b < 2*feature_height + 1; b++) {
-								EuclidianSum = EuclidianSum + (leftImageSum[a][b] - currentSum[a][b])*(leftImageSum[a][b] - currentSum[a][b]);
-							}
-						}
-						int tempDisplacement = normalized_displacement(x-i,y-j,maximum_displacement);
-				if (first) {
-					currentMin = EuclidianSum;
-					minX = x;
-					minY = y;
-					first = 0;
-					curDisplacement = tempDisplacement;
-					}
-				else if (EuclidianSum < currentMin) {
-					currentMin = EuclidianSum;
-					minX = x;
-					minY = y;
-					curDisplacement = tempDisplacement;
-				}
-				else if ((EuclidianSum == currentMin) & (tempDisplacement < curDisplacement)) {
-					currentMin = EuclidianSum;
-					minX = x;
-					minY = y;
-					curDisplacement = tempDisplacement;
-				}
-				}
+		
+		for (int i=0;i<image_width;i++){
+			for (int j=0;j<image_height;j++){
+				lefti[i][j]=*left;
+				righti[i][j]=*right;
+				left++;
+				right++;
 			}
 		}
 
-
-/* printf("Setting graph depth to: ");
-*depth_map = normalized_displacement(minX-i,minY-j,maximum_displacement);   /* After looping through every feature in the search space, assign the value to depth map */
-depth_map = depth_map + 1;
-}
-}
-}
-}
+		
+		for (int i=0;i<image_width;i++){//loop and set depth map
+			for (int j=0;j<image_height;j++){
+				
+				if((i+feature_width>=image_width)|(i-feature_width<0)|(j+feature_height>=image_height)|(j-feature_height<0)){ // test valid center
+					
+					*depth_map = 0;
+					depth_map++;
+				
+				}else{//if it is valid center 
+					
+					int minDf = INT_MAX;
+					int mindx = INT_MAX;
+					int mindy = INT_MAX;
+					
+					for(int dx = -maximum_displacement;dx<=maximum_displacement;dx++){//loop search area
+						
+						for(int dy = -maximum_displacement;dy<=maximum_displacement;dy++){
+							
+							int x = dx+x, y=dy+y;
+							if((x+feature_width>=image_width)|(x-feature_width<0)|(y+feature_height>=image_height)|(y-feature_height<0)){//test valid center
+								
+							}else{
+									int df = 0;
+									for(int a=-feature_width;a<=feature_width;a++){
+										for(int b=-feature_height;b<=feature_height;b++){
+											int temp = lefti[x+a][y+b]-righti[x+a][y+b];
+											temp *= temp;
+											df += temp;
+										}
+									}
+									
+									if(df<minDf){
+										minDf = df;
+										mindx = x;
+										mindy = y;
+									}else if(df == minDf){
+										if(normalized_displacement(x,y,maximum_displacement)<normalized_displacement(mindx,mindy,maximum_displacement)){
+											mindx = x;
+											mindy = y;
+											minDf =df;
+										}
+									}
+							
+							}
+						}
+					}
+					
+					*depth_map= normalized_displacement(mindx,mindy,maximum_displacement);
+					depth_map++;
+				}
+			}
+		}
+	}	

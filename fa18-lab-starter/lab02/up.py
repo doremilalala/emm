@@ -7,10 +7,11 @@ def calu(fun, *arg):
     while(len(p)):
         sec = p.pop()
         print(f"set{fir}and{sec} ")
-        min = fun(fir)
+        min = fun((fir+sec)/2)
+        # print(f"cal{(fir+sec)/2} get last {left}")
         max = fun(sec)
-        if(fun(fir)>fun(sec)):
-            min, max = max, min
+        # if(fun(fir)>fun(sec)):
+        #     min, max = max, min
         left += min*(sec-fir)
         right += max*(sec-fir)
         fir =sec 
@@ -19,7 +20,7 @@ def calu(fun, *arg):
     print(right)
 
 def sqr(x):
-    return 2*math.exp(x)+2
+    return math.sin(x)
 
-p = (0+i*.1 for i in range(11))
+p = (8+4*i for i in range(4))
 calu(sqr,*p)
