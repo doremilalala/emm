@@ -95,7 +95,29 @@ qNode *restOfNode(unsigned char *depth_map, int map_width, int xCor, int yCor, i
     return curr;
 }
 
+qNode *depth_to_quadh(unsigned char *depth_map, int map_width, int x, int y, int width){
+    qNode *nod = malloc(sizeof(qNode));
+    int homo = homogenous(depth_map,map_width,x,y,width);
+    if(homo!=-1){
+        nod->leaf =1;
+        nod->x = x;
+        nod->y =y;
+        nod->gray_value = homo;
+        nod->size = width;
+    }else{
+        nod->leaf = 0;
+        nod->child_NW = depth_to_quadh(depth_map,map_width,x,y,width/2);
+        nod->child_NE = depth_to_quadh(depth_map,map_width,x+width/2,y,width/2);
+        nod->child_SE = depth_to_quadh(depth_map,map_width,x,y+width/2,width/2);
+        nod->child_SW = depth_to_quadh(depth_map,map_width,x+width/2,y+width/2,width/2);
+    }
+    
+    return nod;
+}
+
 qNode *depth_to_quad(unsigned char *depth_map, int map_width) {
+    
+    return depth_to_quadh(depth_map,map_width,0,0,map_width);
 
     /* YOUR CODE HERE */
     if(map_width == 1) {
