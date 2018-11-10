@@ -4,14 +4,13 @@ import os
 import subprocess
 import sys
 import re
-import base64
-# import resource
+import resource
 
 class TestFailedError(Exception):
     pass
 
 def start_process(args):
-    print ("Running: {}".format(' '.join(args)))
+    print "Running: {}".format(' '.join(args))
     process = subprocess.Popen(args,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -40,7 +39,7 @@ def test_distance_map(test_cases = None):
     output_folder = 'test/output/'
     expected_folder = 'test/expected/'
 
-    if not os.stat(output_folder):
+    if not os.path.exists(output_folder):
         os.mkdir(output_folder)
 
     if test_cases is None:
@@ -128,7 +127,7 @@ def test_distance_map(test_cases = None):
 
     any_failed = False
 
-    print ("Testing {} ...".format(check_command))
+    print "Testing {} ...".format(check_command)
 
     for test_case in test_cases:
         try:
@@ -143,7 +142,7 @@ def test_distance_map(test_cases = None):
 
             process = start_process(command)
 
-            lines = process.stdout.read().decode('UTF-8')
+            lines = process.stdout.read()
             process.wait()
             if process.returncode != 0:
                 raise TestFailedError('Non-zero return-code')
@@ -187,10 +186,10 @@ def test_distance_map(test_cases = None):
                 raise TestFailedError('Wrong output. Check {} and {}'.format(
                     test_case['actual'], test_case['expected']))
         except TestFailedError as err:
-            print (err)
+            print err.message
             any_failed = True
         except OSError as err:
-            print ("Error trying to execute program (did you compile?)")
+            print "Error trying to execute program (did you compile?)"
             any_failed = True
 
     return not any_failed
@@ -208,7 +207,7 @@ def test_quadtree(test_cases = None):
     output_folder = 'test/output/'
     expected_folder = 'test/expected/'
 
-    if not os.stat(output_folder):
+    if not os.path.exists(output_folder):
         os.mkdir(output_folder)
 
     if test_cases is None:
@@ -230,7 +229,7 @@ def test_quadtree(test_cases = None):
             })
     any_failed = False
 
-    print ("Testing {} ...".format(check_command))
+    print "Testing {} ...".format(check_command)
 
     for test_case in test_cases:
         try:
@@ -259,10 +258,10 @@ def test_quadtree(test_cases = None):
                 raise TestFailedError('Wrong output. Check {} and {}'.format(
                     test_case['actual'], test_case['expected']))
         except TestFailedError as err:
-            print (err)
+            print err.message
             any_failed = True
         except OSError as err:
-            print ("Error trying to execute program (did you compile?)")
+            print "Error trying to execute program (did you compile?)"
             any_failed = True
 
     return not any_failed
@@ -271,9 +270,9 @@ if __name__ == '__main__':
     distance_map_result = test_distance_map()
     quadtree_result = test_quadtree()
     if distance_map_result and quadtree_result:
-        print ("All OK")
+        print "All OK"
         sys.exit(0)
     else:
-        print ("Some tests FAILED")
+        print "Some tests FAILED"
         sys.exit(1)
 
